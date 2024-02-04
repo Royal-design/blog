@@ -1,0 +1,39 @@
+.header-form {
+  padding: 0 2rem;
+  background-color: rgb(2, 72, 97);
+  height: 7rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .header-input {
+    border-radius: 1rem;
+    border: none;
+    height: 4rem;
+    padding: 0 2rem;
+    font-size: 1.5rem;
+    transition: all 0.4s;
+    width: 20%;
+    &:focus {
+      outline: 1px solid red;
+      width: 30%;
+    }
+  }
+  a {
+    margin-right: 1rem;
+    text-decoration: none;
+    background-color: #ededed;
+    padding: 1rem 1.5rem;
+    font-size: 1.5rem;
+    transition: all 0.4s;
+    border-radius: 1rem;
+    color: black;
+    &:hover {
+      background-color: #6c1c04;
+      color: white;
+    }
+  }
+  .active {
+    background-color: red;
+    color: white;
+  }
+}

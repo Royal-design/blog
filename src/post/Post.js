@@ -4,8 +4,7 @@ import "./post.style.scss";
 export const Post = ({ posts, handleDelete }) => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const post = posts.find((post) => post.id.toString() === id);
-  console.log(post);
+  const post = posts.find((post) => post.id === id);
   return (
     <main className="post-page">
       <article>
@@ -17,7 +16,9 @@ export const Post = ({ posts, handleDelete }) => {
             </div>
 
             <p className="post-body">{post.body}</p>
-
+            <Link to={`/edit/${post.id}`}>
+              <button className="active">Edit</button>
+            </Link>
             <button
               onClick={() => {
                 handleDelete(post.id);

@@ -4,10 +4,10 @@ import { Header } from "../Header/Header";
 import "./rootlayout.style.scss";
 import { Form } from "../Form/Form";
 
-export const RootLayout = ({ search, setsearch }) => {
+export const RootLayout = ({ search, setsearch, width }) => {
   return (
     <div className="root-layout">
-      <Header />
+      <Header width={width} />
       <Form NavLink={NavLink} search={search} setsearch={setsearch} />
       <main>
         <Outlet />

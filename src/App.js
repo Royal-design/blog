@@ -9,43 +9,30 @@ import { AboutPage } from "./pages/Aboutpage/AboutPage";
 import { PostPage } from "./pages/PostPage/PostPage";
 import { ErrorPage } from "./ErrorPage";
 import { Post } from "./post/Post";
+import api from "./api/posts";
+import { EditPost } from "./EditPost";
+import useWindowSize from "./hooks/useWindowSize";
+import useAxiosFetch from "./hooks/useAxiosFetch";
 
 function App() {
-  const [posts, setposts] = useState([
-    {
-      id: 1,
-      title: "My First Post",
-      datetime: "February 2, 2024 11:12:34 AM",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem ipsam, facilis ex similique commodi quam exercitationem pariatur dignissimos aperiam autem qui tempora error aliquid aspernatur sint sequi quis amet aliquam."
-    },
-    {
-      id: 2,
-      title: "My Second Post",
-      datetime: "February 1, 2024 10:12:34 AM",
-      body: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Veritatis optio aliquam impedit deserunt? Expedita error quasi tenetur nam ducimus sequi non veritatis suscipit corrupti obcaecati quibusdam beatae reiciendis, esse nesciunt."
-    },
-    {
-      id: 3,
-      title: "My Third Post",
-      datetime: "February 3, 2024 9:12:34 AM",
-      body: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Rem repellendus cupiditate fuga consequatur eaque temporibus, dolor iusto consequuntur minima ullam, porro facilis ratione unde culpa obcaecati deserunt vero quidem. Totam."
-    },
-    {
-      id: 4,
-      title: "My Fourth Post",
-      datetime: "February 3, 2024 2:12:30 pM",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia exercitationem optio aliquam, itaque placeat, quae dolore explicabo, laboriosam consequuntur veritatis obcaecati tempora fuga nam pariatur incidunt ipsum? Adipisci, illo aliquam."
-    }
-  ]);
+  const [posts, setposts] = useState([]);
   const [title, settitle] = useState("");
   const [newpost, setnewpost] = useState("");
   const [search, setsearch] = useState("");
   const [searchresult, setsearchresult] = useState([]);
+  const [titleedit, settitleedit] = useState("");
+  const [newpostedit, setnewpostedit] = useState("");
+
+  const { width } = useWindowSize();
+
+  const { isLoading, fetchError, data } = useAxiosFetch(
+    "http://localhost:3500/posts"
+  );
   useEffect(() => {
-    const saveNewpost = JSON.parse(localStorage.getItem("newpost"));
+    setposts(data);
+  }, [data]);
 
-    if (saveNewpost) setposts(saveNewpost);
-
+  useEffect(() => {
     const filteredResults = posts.filter(
       (post) =>
         post.body.toLowerCase().includes(search.toLowerCase()) ||
@@ -54,13 +41,7 @@ function App() {
     setsearchresult(filteredResults.reverse());
   }, [posts, search]);
 
-  const handleDelete = (id) => {
-    const newPost = posts.filter((post) => post.id !== id);
-    setposts(newPost);
-    localStorage.setItem("newpost", JSON.stringify(newPost));
-  };
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (title !== "" && newpost !== "") {
       const titleTransform = title.length
         ? title
@@ -82,17 +63,72 @@ function App() {
         minute: "2-digit",
         second: "2-digit"
       }).format(day);
+
       const postObj = {
         id: id,
         title: titleTransform,
         datetime: formatDay,
         body: bodyTransform
       };
-      const updatePost = [...posts, postObj];
-      setposts(updatePost);
-      settitle("");
-      setnewpost("");
-      localStorage.setItem("newpost", JSON.stringify(updatePost));
+      try {
+        const response = await api.post("/posts", postObj);
+        const updatePost = [...posts, response.data];
+        setposts(updatePost);
+        settitle("");
+        setnewpost("");
+      } catch (error) {
+        console.log(`Error: ${error.message}`);
+      }
+    }
+  };
+
+  const handleEdit = async (id) => {
+    const titleEditTransform = titleedit.length
+      ? titleedit
+          .split(" ")
+          .map((titleedit) => titleedit[0].toUpperCase() + titleedit.slice(1))
+          .join(" ")
+      : titleedit;
+    const bodyEditTransform = newpostedit.length
+      ? newpostedit[0].toUpperCase() + newpostedit.slice(1)
+      : newpostedit;
+
+    const day = new Date();
+
+    const formatDay = Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    }).format(day);
+
+    const postObj = {
+      id,
+      title: titleEditTransform,
+      datetime: formatDay,
+      body: bodyEditTransform
+    };
+    try {
+      const response = await api.put(`/posts/${id}`, postObj);
+
+      setposts(
+        posts.map((post) => (post.id === id ? { ...response.data } : post))
+      );
+      settitleedit("");
+      setnewpostedit("");
+    } catch (error) {
+      console.log(`Error: ${error.message}`);
+    }
+  };
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/posts/${id}`);
+      const postList = posts.filter((post) => post.id !== id);
+      setposts(postList);
+    } catch (error) {
+      console.log(`Error: ${error.message}`);
     }
   };
   return (
@@ -100,10 +136,32 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={<RootLayout search={search} setsearch={setsearch} />}
+          element={
+            <RootLayout search={search} setsearch={setsearch} width={width} />
+          }
         >
-          <Route index element={<HomePage posts={searchresult} />}></Route>
+          <Route
+            index
+            element={
+              <HomePage
+                posts={searchresult}
+                isLoading={isLoading}
+                fetchError={fetchError}
+              />
+            }
+          ></Route>
           <Route path="/about" element={<AboutPage />}></Route>
+          <Route
+            path="/edit/:id"
+            element=<EditPost
+              newpostedit={newpostedit}
+              settitleedit={settitleedit}
+              setnewpostedit={setnewpostedit}
+              titleedit={titleedit}
+              handleEdit={handleEdit}
+              posts={posts}
+            />
+          />
           <Route path="/post">
             <Route
               path="/post"

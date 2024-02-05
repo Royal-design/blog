@@ -33,8 +33,8 @@ export const PostPage = ({
 
       <button
         type="submit"
-        onClick={(e) => {
-          handleSubmit(e);
+        onClick={() => {
+          handleSubmit();
           navigate("/");
         }}
       >

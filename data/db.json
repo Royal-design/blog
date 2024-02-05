@@ -1,0 +1,22 @@
+{
+  "posts": [
+    {
+      "id": "1",
+      "title": "My First Post",
+      "datetime": "February 2, 2024 11:12:34 AM",
+      "body": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem ipsam, facilis ex similique commodi quam exercitationem pariatur dignissimos aperiam autem qui tempora error aliquid aspernatur sint sequi quis amet aliquam."
+    },
+    {
+      "id": "2",
+      "title": "My Second Post",
+      "datetime": "February 1, 2024 10:12:34 AM",
+      "body": "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Veritatis optio aliquam impedit deserunt? Expedita error quasi tenetur nam ducimus sequi non veritatis suscipit corrupti obcaecati quibusdam beatae reiciendis, esse nesciunt."
+    },
+    {
+      "id": "3",
+      "title": "My Third Post",
+      "datetime": "February 3, 2024 9:12:34 AM",
+      "body": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Rem repellendus cupiditate fuga consequatur eaque temporibus, dolor iusto consequuntur minima ullam, porro facilis ratione unde culpa obcaecati deserunt vero quidem. Totam."
+    }
+  ]
+}
